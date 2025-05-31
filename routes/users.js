@@ -278,6 +278,19 @@ router.post("/api/users/", upload.single("image"), async (req, res) => {
   }
 });
 
+router.get("/api/users/:id/image", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (user && user.image && user.image.data) {
+      res.set("Content-Type", user.image.contentType);
+      res.send(user.image.data);
+    } else {
+      res.status(404).send("Image not found");
+    }
+  } catch (error) {
+    res.status(500).send("Server error");
+  }
+});
 
 router.post("/api/users/login", async (req, res) => {
   try {
