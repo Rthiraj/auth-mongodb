@@ -278,19 +278,28 @@ router.post("/api/users/", upload.single("image"), async (req, res) => {
   }
 });
 
+
+
+// Replace the existing image route in routes/users.js with this:
 router.get("/api/users/:id/image", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (user && user.image && user.image.data) {
-      res.set("Content-Type", user.image.contentType);
-      res.send(user.image.data);
-    } else {
-      res.status(404).send("Image not found");
+    if (!user || !user.image || !user.image.data) {
+      return res.status(404).json({ message: "Image not found" });
     }
+
+    // Convert buffer to base64 string
+    const base64Image = user.image.data.toString("base64");
+
+    res.status(200).json({
+      image: `data:${user.image.contentType};base64,${base64Image}`,
+      contentType: user.image.contentType,
+    });
   } catch (error) {
-    res.status(500).send("Server error");
+    res.status(500).json({ message: `Error fetching image: ${error}` });
   }
 });
+
 
 router.post("/api/users/login", async (req, res) => {
   try {
