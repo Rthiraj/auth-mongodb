@@ -18,7 +18,10 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   biodata: { type: String, required: true },
   jobRole: { type: String, required: true },
-  imagePath: { type: String }, // new field for image URL
+  image: {
+    data: Buffer,
+    contentType: String,
+   } // new field for image URL
 });
 
 const User = mongoose.model("User", userSchema);
