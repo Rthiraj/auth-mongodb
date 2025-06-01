@@ -1,25 +1,25 @@
-import multer from 'multer';
+// import multer from 'multer';
 
-const storage = multer.memoryStorage(); // Use memory instead of disk
-const upload = multer({ storage });
-
-export default upload;
-
-
-
-
-// import multer from "multer";
-
-// const storage = multer.memoryStorage();
-
-// const upload = multer({
-//   storage,
-//   limits: {
-//     fileSize: 5 * 1024 * 1024, // 5MB max
-//   },
-// });
+// const storage = multer.memoryStorage(); // Use memory instead of disk
+// const upload = multer({ storage });
 
 // export default upload;
+
+
+
+
+import multer from "multer";
+
+const storage = multer.memoryStorage();
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max
+  },
+});
+
+export default upload;
 
 // // middleware/upload.js
 // import multer from "multer";
