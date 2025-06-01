@@ -75,7 +75,6 @@ router.delete("/api/users/:id", async (req, res) => {
 
 router.post("/api/users/", upload.single("image"), async (req, res) => {
   const { username, password, biodata, jobRole } = req.body;
-  console.log(req.body);
 
   try {
     const salt = await bcrypt.genSalt(10);
@@ -86,14 +85,8 @@ router.post("/api/users/", upload.single("image"), async (req, res) => {
       password: hashedPassword,
       biodata,
       jobRole,
+      imagePath: req.file ? req.file.path : null, // save relative path
     });
-
-    if (req.file) {
-      newUser.image = {
-        data: req.file.buffer,
-        contentType: req.file.mimetype,
-      };
-    }
 
     const savedUser = await newUser.save();
     res.status(200).json(savedUser);
@@ -102,27 +95,33 @@ router.post("/api/users/", upload.single("image"), async (req, res) => {
   }
 });
 
+router.get("/:id/image", async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user || !user.imagePath) return res.status(404).send("Image not found");
+  res.sendFile(path.resolve(user.imagePath)); // Or stream if using buffer
+});
+
 
 
 // Replace the existing image route in routes/users.js with this:
-router.get("/api/users/:id/image", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user || !user.image || !user.image.data) {
-      return res.status(404).json({ message: "Image not found" });
-    }
+// router.get("/api/users/:id/image", async (req, res) => {
+//   try {
+//     const user = await User.findById(req.params.id);
+//     if (!user || !user.image || !user.image.data) {
+//       return res.status(404).json({ message: "Image not found" });
+//     }
 
-    // Convert buffer to base64 string
-    const base64Image = user.image.data.toString("base64");
+//     // Convert buffer to base64 string
+//     const base64Image = user.image.data.toString("base64");
 
-    res.status(200).json({
-      image: `data:${user.image.contentType};base64,${base64Image}`,
-      contentType: user.image.contentType,
-    });
-  } catch (error) {
-    res.status(500).json({ message: `Error fetching image: ${error}` });
-  }
-});
+//     res.status(200).json({
+//       image: `data:${user.image.contentType};base64,${base64Image}`,
+//       contentType: user.image.contentType,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: `Error fetching image: ${error}` });
+//   }
+// });
 
 
 router.post("/api/users/login", async (req, res) => {
