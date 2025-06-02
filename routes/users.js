@@ -85,7 +85,12 @@ router.post("/api/users/", upload.single("image"), async (req, res) => {
       password: hashedPassword,
       biodata,
       jobRole,
-      imagePath: req.file ? req.file.path : null, // save relative path
+      image: req.file
+  ? {
+      data: req.file.buffer,
+      contentType: req.file.mimetype,
+    }
+  : null, // save relative path
     });
 
     const savedUser = await newUser.save();
