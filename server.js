@@ -15,6 +15,11 @@ app.use(express.urlencoded({ extended: true }));
 // ✅ Serve static files from uploads folder
 app.use("/uploads", express.static("uploads"));
 
+app.use(cors({
+  origin: "http://localhost:5173", // or "*" for all origins
+  credentials: true, // if using cookies or auth headers
+}));
+
 app.use(users);
 
 const uri = process.env.MONGODB_URI;
