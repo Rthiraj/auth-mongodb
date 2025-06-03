@@ -1,8 +1,9 @@
 import express from "express";
-const router = express.Router();
 import User from "../models/User.js";
-
 import bcrypt from "bcryptjs";
+import upload from "../middleware/upload.js";
+
+const router = express.Router();
 
 router.get("/api/users/", async (req, res) => {
   try {
@@ -72,53 +73,31 @@ router.delete("/api/users/:id", async (req, res) => {
   }
 });
 
-// router.post("/api/users/", upload.single("image"), async (req, res) => {
-//   const { username, password, biodata, jobRole } = req.body;
 
-//   try {
-//     const salt = await bcrypt.genSalt(10);
-//     const hashedPassword = await bcrypt.hash(password, salt);
+//Create User with Image Upload
+router.post("/api/users/", upload.single("image"), async (req, res) => {
+  const { username, password, biodata, jobRole } = req.body;
 
-//     const newUser = new User({
-//       username,
-//       password: hashedPassword,
-//       biodata,
-//       jobRole,
-//       image: req.file
-//   ? {
-//       data: req.file.buffer,
-//       contentType: req.file.mimetype,
-//     }
-//   : null, // save relative path
-//     });
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-//     const savedUser = await newUser.save();
-//     res.status(200).json(savedUser);
-//   } catch (error) {
-//     res.status(400).json({ message: `Error creating a new user: ${error}` });
-//   }
-// });
+    const newUser = new User({
+      username,
+      password: hashedPassword,
+      biodata,
+      jobRole,
+      image: req.file ? `/uploads/${req.file.filename}` : null, // ✅ Save image path
+    });
 
-// // Replace the existing image route in routes/users.js with this:
-// router.get("/api/users/:id/image", async (req, res) => {
-//   try {
-//     const user = await User.findById(req.params.id);
-//     if (!user || !user.image || !user.image.data) {
-//       return res.status(404).json({ message: "Image not found" });
-//     }
-
-//     // Convert buffer to base64 string
-//     const base64Image = user.image.data.toString("base64");
-
-//     res.status(200).json({
-//       image: `data:${user.image.contentType};base64,${base64Image}`,
-//       contentType: user.image.contentType,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ message: `Error fetching image: ${error}` });
-//   }
-// });
-
+    const savedUser = await newUser.save();
+    res.status(200).json({ message: "User created", user: savedUser });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ message: `Error creating a new user`, error: error.message });
+  }
+});
 
 router.post("/api/users/login", async (req, res) => {
   try {

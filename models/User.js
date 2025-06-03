@@ -1,16 +1,3 @@
-// import mongoose from "mongoose"; 
-// const userSchema = new mongoose. Schema 
-// ({ 
-// username: { type: String, required: true, unique: true },
-// password: { type: String, required: true }, 
-// biodata: { type: String, required: true }, 
-// jobRole: { type: String, required: true }, 
-// }); 
-
-// const User = mongoose.model("User", userSchema); 
-
-// export default User;
-
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
@@ -18,11 +5,13 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   biodata: { type: String, required: true },
   jobRole: { type: String, required: true },
-  image: {
-    data: Buffer,
-    contentType: String,
-   } // new field for image URL
+  image: { type: String }, // Optional image URL field
 });
 
 const User = mongoose.model("User", userSchema);
+
 export default User;
+
+
+
+
